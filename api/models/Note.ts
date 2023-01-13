@@ -26,14 +26,21 @@ export default class Note {
         this.#content = content;
     }
 
+    //converts title into a lowercase filename, replacing spaces with underlines
+    static getFileName(title: string): string {
+        return title.toLowerCase().replace(/ +/g, '_') + ".json";
+    }
+
+    //returns a note from the specified pathname
     static async readNote(path: string): Promise<Note> {
         const obj: Buffer = await fs.promises.readFile(path);
         const json = JSON.parse(obj.toString());
         return new Note(json?.title, json?.content);
     }
 
+    //checks if a note exists with the given title
     static exists(title: string): boolean {
-        return fs.existsSync(`./notes/${title}.json`);
+        return fs.existsSync(`./notes/${this.getFileName(title)}`);
     }
 
     toJSON(): Object {

@@ -34,6 +34,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 //error handler
 app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
+    console.log(error);
     res.status(error.statusCode || 500);
     res.json({
         error: {

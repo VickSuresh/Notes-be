@@ -1,5 +1,5 @@
 import Note from "../models/Note";
-import createError, { HttpError } from "http-errors";
+import createError from "http-errors";
 import * as fs from "node:fs/promises";
 
 export async function createNote(title?: string, content?: string): Promise<Note> {
@@ -18,7 +18,7 @@ export async function createNote(title?: string, content?: string): Promise<Note
 
     const note: Note = new Note(title, content);
 
-    await fs.writeFile(`./notes/${title}.json`, JSON.stringify(note));
+    await fs.writeFile(`./notes/${Note.getFileName(title)}`, JSON.stringify(note));
 
     return note;
 }
@@ -49,20 +49,27 @@ export async function updateNote(title: string, newTitle?: string, newContent?: 
         throw createError.NotFound("Note doesn't exist");
     }
 
+    if (newTitle && Note.exists(newTitle)) {
+        throw createError.Conflict("Note already exists with new title");
+    }
+
     if (newContent && newContent.length >= 140) {
         throw createError.BadRequest("Note length must be less than 140 characters");
     }
 
-    const note: Note = await Note.readNote(`./notes/${title}.json`);
+    let fileName: string = Note.getFileName(title);
+
+    const note: Note = await Note.readNote(`./notes/${fileName}`);
 
     if (newTitle) {
         note.editTitle(newTitle);
-        await fs.rm(`./notes/${title}.json`);
+        await fs.rm(`./notes/${fileName}`);
+        fileName = Note.getFileName(note.getTitle());
     }
 
     if (newContent) note.editContent(newContent);
 
-    await fs.writeFile(`./notes/${note.getTitle()}.json`, JSON.stringify(note));
+    await fs.writeFile(`./notes/${fileName}`, JSON.stringify(note));
     return note;
 
 }
@@ -73,5 +80,5 @@ export async function deleteNote(title: string): Promise<void> {
         throw createError.NotFound("Note doesn't exist");
     }
 
-    await fs.rm(`./notes/${title}.json`);
+    await fs.rm(`./notes/${Note.getFileName(title)}`);
 }

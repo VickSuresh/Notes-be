@@ -39,9 +39,9 @@ router.put('/updateNote', async function (req: Request, res: Response, next: Nex
     }
 });
 
-router.delete('/deleteNote', async function (req: Request, res: Response, next: NextFunction) {
+router.delete('/deleteNote/:title', async function (req: Request, res: Response, next: NextFunction) {
     try {
-        const { title } = req.body;
+        const title = req.params.title;
         await NoteController.deleteNote(title);
         res.status(200).send("Successfully deleted");
     } catch (err) {
