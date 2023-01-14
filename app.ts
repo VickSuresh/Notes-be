@@ -3,8 +3,12 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import createError, { HttpError } from "http-errors";
 import noteRouter from "./api/routes/NoteRoutes";
+import { mkdirSync, existsSync } from "node:fs";
 
 dotenv.config();
+
+//create directory if it doesn't exist
+if (!existsSync('./notes')) mkdirSync('./notes');
 
 const app: Express = express();
 

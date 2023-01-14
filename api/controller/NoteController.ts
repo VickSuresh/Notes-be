@@ -35,7 +35,7 @@ export async function readAllNotes(): Promise<Note[]> {
     return notes;
 }
 
-export async function updateNote(title: string, newTitle?: string, newContent?: string): Promise<Note> {
+export async function updateNote(title?: string, newTitle?: string, newContent?: string): Promise<Note> {
 
     if (!title) {
         throw createError.BadRequest("Title required");
